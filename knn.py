@@ -21,31 +21,31 @@ class Person():
     #     print "vacation: {}, eCreadit: {}, salary:{}, property:{}, label:{}".format(self.vacation,
     #      self.e_credit, self.salary, self.p_property, self.label)
 
-def typeMatrix(row):
-    matrix = np.zeros((5,5))
-    if row == 'student':
-        matrix[0,0] = 1.0
-    elif row == 'engineer':
-        matrix[1,1] = 1.0
-    elif row == 'librarian':
-        matrix[2,2] = 1.0
-    elif row == 'professor':
-        matrix[3,3] = 1.0
-    else:
-        matrix[4,4] = 1.0
-    return matrix
+# def typeMatrix(row):
+#     matrix = np.zeros((5,5))
+#     if row == 'student':
+#         matrix[0,0] = 1.0
+#     elif row == 'engineer':
+#         matrix[1,1] = 1.0
+#     elif row == 'librarian':
+#         matrix[2,2] = 1.0
+#     elif row == 'professor':
+#         matrix[3,3] = 1.0
+#     else:
+#         matrix[4,4] = 1.0
+#     return matrix
 
-def lifeStyleMatrix(row):
-    matrix = np.zeros((4,4))
-    if row == 'spend<<saving':
-        matrix[0,0] = 1.0
-    elif row == 'spend<saving':
-        matrix[1,1] = 1.0
-    elif row == 'spend>saving':
-        matrix[2,2] = 1.0
-    else:
-        matrix[3,3] = 1.0
-    return matrix
+# def lifeStyleMatrix(row):
+#     matrix = np.zeros((4,4))
+#     if row == 'spend<<saving':
+#         matrix[0,0] = 1.0
+#     elif row == 'spend<saving':
+#         matrix[1,1] = 1.0
+#     elif row == 'spend>saving':
+#         matrix[2,2] = 1.0
+#     else:
+#         matrix[3,3] = 1.0
+#     return matrix
 
 def loadData(file_path):
     testSet = []
@@ -73,10 +73,10 @@ def loadData(file_path):
 
     for i in range(len(testSet[:,0])):
         p_type = testSet[:,1][i]
-        p_type_matrix = typeMatrix(p_type)
+        # p_type_matrix = typeMatrix(p_type)
 
         p_life_style = testSet[:,2][i]
-        p_life_style_matric = lifeStyleMatrix(p_life_style)
+        # p_life_style_matric = lifeStyleMatrix(p_life_style)
 
         va = count(va_list[-1], va_list[0], testSet[i,3])
         credit = count(creadit_list[-1], creadit_list[0], testSet[i,4])
@@ -84,7 +84,7 @@ def loadData(file_path):
         property_ = count(property_list[-1], property_list[0], testSet[i,6])
         label = testSet[:,7][i]
 
-        person = Person(p_type_matrix, p_life_style_matric, va, credit, salary, property_, label)
+        person = Person(p_type, p_life_style, va, credit, salary, property_, label)
         person_list.append(person)
         return person_list
 

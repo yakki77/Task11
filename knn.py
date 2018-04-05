@@ -12,13 +12,13 @@ class Person():
         self.salary = salary
         self.p_property = p_property
 
-    def print_person(self):
-        print "type:"
-        print self.personal_type
-        print "style:"
-        print self.life_style
-        print "vacation: {}, eCreadit: {}, salary:{}, property:{}".format(self.vacation,
-         self.e_credit, self.salary, self.p_property)
+    # def print_person(self):
+    #     print "type:"
+    #     print self.personal_type
+    #     print "style:"
+    #     print self.life_style
+    #     print "vacation: {}, eCreadit: {}, salary:{}, property:{}".format(self.vacation,
+    #      self.e_credit, self.salary, self.p_property)
 
 def typeMatrix(row):
     matrix = np.zeros((5,5))
@@ -85,8 +85,7 @@ def loadData(file_path):
         person = Person(p_type_matrix, p_life_style_matric, va, credit, salary, property_)
         person_list.append(person)
     
-    for p in person_list:
-        p.print_person()
+        return person_list
 
 
 def count(max_num, min_num, num):
@@ -139,5 +138,4 @@ def main():
 		predictions.append(label)
 	print(predictions)
 
-loadData("trainProdSelection.csv")
 

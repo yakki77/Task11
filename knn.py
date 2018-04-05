@@ -4,21 +4,22 @@ import csv
 import numpy as np
 
 class Person():
-    def __init__(self, personal_type, life_style, vacation, e_credit, salary, p_property):
+    def __init__(self, personal_type, life_style, vacation, e_credit, salary, p_property, label):
         self.personal_type = personal_type
         self.life_style = life_style
         self.vacation = vacation
         self.e_credit = e_credit
         self.salary = salary
         self.p_property = p_property
+        self.label = label
 
     # def print_person(self):
     #     print "type:"
     #     print self.personal_type
     #     print "style:"
     #     print self.life_style
-    #     print "vacation: {}, eCreadit: {}, salary:{}, property:{}".format(self.vacation,
-    #      self.e_credit, self.salary, self.p_property)
+    #     print "vacation: {}, eCreadit: {}, salary:{}, property:{}, label:{}".format(self.vacation,
+    #      self.e_credit, self.salary, self.p_property, self.label)
 
 def typeMatrix(row):
     matrix = np.zeros((5,5))
@@ -81,10 +82,10 @@ def loadData(file_path):
         credit = count(creadit_list[-1], creadit_list[0], testSet[i,4])
         salary = count(salary_list[-1], salary_list[0], testSet[i,5])
         property_ = count(property_list[-1], property_list[0], testSet[i,6])
+        label = testSet[:,7][i]
 
-        person = Person(p_type_matrix, p_life_style_matric, va, credit, salary, property_)
+        person = Person(p_type_matrix, p_life_style_matric, va, credit, salary, property_, label)
         person_list.append(person)
-    
         return person_list
 
 
@@ -137,5 +138,4 @@ def main():
 		label = getLabel(neighbors)
 		predictions.append(label)
 	print(predictions)
-
 

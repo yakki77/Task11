@@ -3,15 +3,15 @@ import operator
 import csv
 import numpy as np
 
-class Person():
-    def __init__(self, personal_type, life_style, vacation, e_credit, salary, p_property, label):
-        self.personal_type = personal_type
-        self.life_style = life_style
-        self.vacation = vacation
-        self.e_credit = e_credit
-        self.salary = salary
-        self.p_property = p_property
-        self.label = label
+# class Person():
+#     def __init__(self, personal_type, life_style, vacation, e_credit, salary, p_property, label):
+#         self.personal_type = personal_type
+#         self.life_style = life_style
+#         self.vacation = vacation
+#         self.e_credit = e_credit
+#         self.salary = salary
+#         self.p_property = p_property
+#         self.label = label
 
     # def print_person(self):
     #     print "type:"
@@ -59,34 +59,37 @@ def loadData(file_path):
                 testSet.append(features)
             index += 1
     testSet = np.matrix(testSet)
-    va_list = [float(i) for i in testSet[:,3]]
+    va_list = [float(i) for i in testSet[:,2]]
     va_list.sort()
 
-    creadit_list = [float(i) for i in testSet[:,4]]
+    creadit_list = [float(i) for i in testSet[:,3]]
     creadit_list.sort()
 
-    salary_list = [float(i) for i in testSet[:,5]]
+    salary_list = [float(i) for i in testSet[:,4]]
     salary_list.sort()
 
-    property_list = [float(i) for i in testSet[:,6]]
+    property_list = [float(i) for i in testSet[:,5]]
     property_list.sort()
 
-    for i in range(len(testSet[:,0])):
-        p_type = testSet[:,1][i]
-        # p_type_matrix = typeMatrix(p_type)
 
-        p_life_style = testSet[:,2][i]
+
+    for i in range(len(testSet[:,0])):
+        person = []
+        person.append(testSet[:,0][i], testSet[:,1][i])
+        # p_type_matrix = typeMatrix(p_type)
+        # life_style = testSet[:,1][i]
         # p_life_style_matric = lifeStyleMatrix(p_life_style)
 
-        va = count(va_list[-1], va_list[0], testSet[i,3])
-        credit = count(creadit_list[-1], creadit_list[0], testSet[i,4])
-        salary = count(salary_list[-1], salary_list[0], testSet[i,5])
-        property_ = count(property_list[-1], property_list[0], testSet[i,6])
-        label = testSet[:,7][i]
-
-        person = Person(p_type, p_life_style, va, credit, salary, property_, label)
+        va = count(va_list[-1], va_list[0], testSet[i,2])
+        credit = count(creadit_list[-1], creadit_list[0], testSet[i,3])
+        salary = count(salary_list[-1], salary_list[0], testSet[i,4])
+        property_ = count(property_list[-1], property_list[0], testSet[i,5])
+        label = testSet[:,6][i]
+        person.append(va, credit, salary, property_, label)
+        # person = Person(p_type, p_life_style, va, credit, salary, property_, label)
         person_list.append(person)
-        return person_list
+    
+    return person_list
 
 
 def count(max_num, min_num, num):

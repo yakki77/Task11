@@ -1,7 +1,6 @@
 import math
 import operator
 import csv
-import numpy as np
 
 def loadData(file_path):
     testSet = []
@@ -14,51 +13,49 @@ def loadData(file_path):
                 features = row[0].split(',')
                 testSet.append(features)
             index += 1
-    testSet = np.matrix(testSet)
-    va_list = [float(i[0,0]) for i in testSet[:,2]]
-    va_list.sort()
+    max_list=[]
+    min_list=[]
+    for i in range(4):
+        vector = []
+        for j in range(len(testSet)):
+            vector.append(testSet[j][i+2])
+        max_list.append(max_num_in_list(vector))
+        min_list.append(min_num_in_list(vector))
+    for i in range(len(testSet)):
+        for j in range(4):
+            testSet[i][j+2] = count(max_list[j],min_list[j],testSet[i][j+2])
+    return testSet
 
-    creadit_list = [float(i[0,0]) for i in testSet[:,3]]
-    creadit_list.sort()
-
-    salary_list = [float(i[0,0]) for i in testSet[:,4]]
-    salary_list.sort()
-
-    property_list = [float(i[0,0]) for i in testSet[:,5]]
-    property_list.sort()
-
-    for i in range(len(testSet[:,0])):
-        person = []
-        person.append(testSet[:,0][i])
-        person.append(testSet[:,1][i])
-        va = count(va_list[-1], va_list[0], testSet[i,2])
-        credit = count(creadit_list[-1], creadit_list[0], testSet[i,3])
-        salary = count(salary_list[-1], salary_list[0], testSet[i,4])
-        property_ = count(property_list[-1], property_list[0], testSet[i,5])
-        label = testSet[:,6][i]
-        person.append(va)
-        person.append(credit)
-        person.append(salary)
-        person.append(property_)
-        person.append(label)
-        person_list.append(person)
-    return person_list
-
+def max_num_in_list(list):
+    max = float(list[0])
+    for a in list:
+        a = float(a)
+        if a > max:
+            max = a
+    return max
+def min_num_in_list(list):
+    min = float(list[0])
+    for a in list:
+        a = float(a)
+        if a < min:
+            min = a
+    return min
 
 def count(max_num, min_num, num):
     num = float(num)
+    max_num = float(max_num)
+    min_num = float(min_num)
     return (num - min_num) / (max_num - min_num)
 
 def euclidDistance(vector1,vector2):
     length = len(vector1)
     distance = 0
     for index in range(length-1):
-        
         if index == 0 or index == 1:
             if vector1[index] == vector2[index]:
-                tmp = 1
-            else:
                 tmp = 0
+            else:
+                tmp = 1
         else:
             tmp = vector1[index] - vector2[index]
         distance = distance + pow(tmp,2)
@@ -85,12 +82,11 @@ def getLabel(neighbors):
     		frequency[label] += 1
     	else:
     		frequency[label] = 1
-    return sorted(classVotes.iteritems(), key=operator.itemgetter(1), reverse=True)[0][0]
+    return sorted(frequency.items(), key=operator.itemgetter(1), reverse=True)[0][0]
 
-def main():
-    trainningSet = loadData('./trainProdSelection.csv')
-    testSet = loadData('./testProdSelection.csv')
-    k = 8
+def knn(trainningInputPath,testInputPath,k):
+    trainningSet = loadData(trainningInputPath)
+    testSet = loadData(testInputPath)
     predictions = []
     length = len(testSet)
     for i in range(length):
@@ -99,4 +95,26 @@ def main():
     	predictions.append(label)
     print(predictions)
 
+def getAccuracy(trainningInputPath,testInputPath,k):
+    trainningSet = loadData(trainningInputPath)
+    testSet = loadData(testInputPath)
+    length = len(testSet)
+    sum = 0;
+    correct = 0;
+    for i in range(length):
+        neighbors = findNeighborList(testSet[i],trainningSet,k)
+        label = getLabel(neighbors)
+        if label == testSet[i][-1]:
+            correct += 1
+        sum += 1
+    print('Accuracy: ',correct/sum * 100,'%')
+        
+
+def main():
+    k = 1;
+    testInputPath = './trainProdSelection.csv'
+    trainningInputPath = './trainProdSelection.csv'
+    knn(trainningInputPath,testInputPath,k)
+    getAccuracy(trainningInputPath,testInputPath,k)
+    
 main()

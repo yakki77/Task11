@@ -34,7 +34,7 @@ def loadData(trainningInputPath, testInputPath, trainingSet=[] , testSet=[]):
             testSet[i][j+2] = count(max_list[j],min_list[j],testSet[i][j+2])
     for i in range(len(trainingSet)):
         for j in range(4):
-            trainingSet[i][j+2] = count(max_list[j],min_list[j],testSet[i][j+2])
+            trainingSet[i][j+2] = count(max_list[j],min_list[j],trainingSet[i][j+2])
 
 def max_num_in_list(list):
     max = float(list[0])
@@ -81,7 +81,7 @@ def findNeighborList(testVector,trainningSet,k):
     ans = []
     for neighbor in range(k):
     	ans.append(neighbors[k][0])
-    print(testVector," neighbor: ",ans)
+    #print(testVector," neighbor: ",ans)
     return ans
 
 def getLabel(neighbors):
@@ -117,15 +117,17 @@ def getAccuracy(trainningInputPath,testInputPath,k):
     for i in range(length):
         neighbors = findNeighborList(testSet[i],trainingSet,k)
         label = getLabel(neighbors)
-        if label == testSet[i][-1]:
-            correct += 1
         sum += 1
+        if label != testSet[i][-1]:
+            print("not match: ",testSet[i],"predicted: "+label)
+            continue
+        correct += 1
     print('Accuracy: ',correct/sum * 100,'%')
         
 
 def main():
-    k = 1;
-    testInputPath = './trainProdSelection.csv'
+    k = 3;
+    testInputPath = './self_test.csv'
     trainningInputPath = './trainProdSelection.csv'
     knn(trainningInputPath,testInputPath,k)
     getAccuracy(trainningInputPath,testInputPath,k)

@@ -1,10 +1,5 @@
-from knnme import *
-# euclid distance test
-print('eclid distance test')
-vector1 = [2,3,6,1,2]
-vector2 = [1,1,1,2,3]
-ans = euclidDistance(vector1,vector2)
-print(ans)
+from knn import euclidDistance
+vector1 = ['engineer', 'spend<<saving', 0.3968253968253968, 0.13372093023255813, 0.547378928165766, 0.22732386640321958]
+vector2 = ['engineer', 'spend<<saving', 0.3968253968253968, 0.13372093023255813, 0.547378928165766, 0.22732386640321958]
+print(euclidDistance(vector1,vector2))
 
-#find neighbor list test
-print('find neighbor list test')

@@ -2,10 +2,8 @@ import math
 import operator
 import csv
 
-def loadData(file_path):
-    testSet = []
-    person_list = []
-    with open(file_path, "r") as csvfile:
+def loadData(trainningInputPath, testInputPath, trainingSet=[] , testSet=[]):
+    with open(testInputPath, "r") as csvfile:
         test_data = csv.reader(csvfile, delimiter=' ', quotechar='|')
         index = -1
         for row in test_data:
@@ -13,18 +11,30 @@ def loadData(file_path):
                 features = row[0].split(',')
                 testSet.append(features)
             index += 1
+    with open(trainningInputPath, "r") as csvfile:
+        test_data = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        index = -1
+        for row in test_data:
+            if index >= 0:
+                features = row[0].split(',')
+                trainingSet.append(features)
+            index += 1
     max_list=[]
     min_list=[]
     for i in range(4):
         vector = []
         for j in range(len(testSet)):
             vector.append(testSet[j][i+2])
+        for k in range(len(trainingSet)):
+            vector.append(trainingSet[k][i+2])
         max_list.append(max_num_in_list(vector))
         min_list.append(min_num_in_list(vector))
     for i in range(len(testSet)):
         for j in range(4):
             testSet[i][j+2] = count(max_list[j],min_list[j],testSet[i][j+2])
-    return testSet
+    for i in range(len(trainingSet)):
+        for j in range(4):
+            trainingSet[i][j+2] = count(max_list[j],min_list[j],testSet[i][j+2])
 
 def max_num_in_list(list):
     max = float(list[0])
@@ -71,6 +81,7 @@ def findNeighborList(testVector,trainningSet,k):
     ans = []
     for neighbor in range(k):
     	ans.append(neighbors[k][0])
+    print(testVector," neighbor: ",ans)
     return ans
 
 def getLabel(neighbors):
@@ -85,24 +96,26 @@ def getLabel(neighbors):
     return sorted(frequency.items(), key=operator.itemgetter(1), reverse=True)[0][0]
 
 def knn(trainningInputPath,testInputPath,k):
-    trainningSet = loadData(trainningInputPath)
-    testSet = loadData(testInputPath)
+    trainingSet = []
+    testSet = []
+    loadData(trainningInputPath,testInputPath,trainingSet,testSet)
     predictions = []
     length = len(testSet)
     for i in range(length):
-    	neighbors = findNeighborList(testSet[i],trainningSet,k)
-    	label = getLabel(neighbors)
-    	predictions.append(label)
+        neighbors = findNeighborList(testSet[i],trainingSet,k)
+        label = getLabel(neighbors)
+        predictions.append(label)
     print(predictions)
 
 def getAccuracy(trainningInputPath,testInputPath,k):
-    trainningSet = loadData(trainningInputPath)
-    testSet = loadData(testInputPath)
+    trainingSet = []
+    testSet = []
+    loadData(trainningInputPath,testInputPath,trainingSet,testSet)
     length = len(testSet)
     sum = 0;
     correct = 0;
     for i in range(length):
-        neighbors = findNeighborList(testSet[i],trainningSet,k)
+        neighbors = findNeighborList(testSet[i],trainingSet,k)
         label = getLabel(neighbors)
         if label == testSet[i][-1]:
             correct += 1

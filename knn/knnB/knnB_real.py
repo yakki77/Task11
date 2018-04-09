@@ -105,7 +105,7 @@ def knn(trainningInputPath,testInputPath,k,weightlist):
         neighbors = findNeighborList(testSet[i],trainingSet,k,weightlist)
         label = getLabel(neighbors)
         predictions.append(label)
-    print(predictions)
+    return predictions
 
 def mserror(real,pred):
     length = len(real)
@@ -113,7 +113,8 @@ def mserror(real,pred):
     for i in range(length):
         sum += pow(float(real[i]) - float(pred[i]),2)
     mse = sum / length
-    return mse
+    return math.sqrt(mse)
+
 def getAccuracy(trainningInputPath,testInputPath,k,weightlist):
     trainingSet = []
     testSet = []
@@ -127,15 +128,17 @@ def getAccuracy(trainningInputPath,testInputPath,k,weightlist):
         pred.append(label)
         real.append(testSet[i][-1])
     mse = mserror(real,pred)
-    print('MSE: ',mse)
+    return mse
         
 
 def main():
     k = 5;
     testInputPath = './trainProdIntro_real.csv'
     trainningInputPath = './trainProdIntro_real.csv'
-    weightlist = [1,1,1,2,2,1,2,1]
-    knn(trainningInputPath,testInputPath,k,weightlist)
-    getAccuracy(trainningInputPath,testInputPath,k,weightlist)
+    weightlist = [1.6562256823052202, 1.501442804465919, 5.115261438132741, 6.943574192273207, 10.00062170623412, 0.48831091648035563, 6.144165566203044, 5.826528840985738]
+    predictions = knn(trainningInputPath,testInputPath,k,weightlist)
+    print(predictions)
+    mse = getAccuracy(trainningInputPath,testInputPath,k,weightlist)
+    print('MSE: ',mse)
 
 main()

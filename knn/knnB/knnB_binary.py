@@ -19,22 +19,23 @@ def loadData(trainningInputPath, testInputPath, trainingSet=[] , testSet=[]):
                 features = row[0].split(',')
                 trainingSet.append(features)
             index += 1
-    max_list=[]
-    min_list=[]
-    for i in range(4):
+    max_list={}
+    min_list={}
+    num_column=[2,3,6,7]
+    for i in num_column:
         vector = []
         for j in range(len(testSet)):
-            vector.append(testSet[j][i+2])
+            vector.append(testSet[j][i])
         for k in range(len(trainingSet)):
-            vector.append(trainingSet[k][i+2])
-        max_list.append(max_num_in_list(vector))
-        min_list.append(min_num_in_list(vector))
+            vector.append(trainingSet[k][i])
+        max_list[i]=(max_num_in_list(vector))
+        min_list[i]=(min_num_in_list(vector))
     for i in range(len(testSet)):
-        for j in range(4):
-            testSet[i][j+2] = count(max_list[j],min_list[j],testSet[i][j+2])
+        for j in num_column:
+            testSet[i][j] = count(max_list[j],min_list[j],testSet[i][j])
     for i in range(len(trainingSet)):
-        for j in range(4):
-            trainingSet[i][j+2] = count(max_list[j],min_list[j],trainingSet[i][j+2])
+        for j in num_column:
+            trainingSet[i][j] = count(max_list[j],min_list[j],trainingSet[i][j])
 
 def max_num_in_list(list):
     max = float(list[0])
@@ -62,7 +63,7 @@ def euclidDistance(vector1,vector2,weightlist):
     length = len(vector1)
     distance = 0
     for index in range(length-1):
-        if index == 0 or index == 1:
+        if index == 0 or index == 1 or index == 4 or index == 5:
             if vector1[index] == vector2[index]:
                 tmp = 0
             else:
@@ -127,10 +128,10 @@ def getAccuracy(trainningInputPath,testInputPath,k,weightlist):
         
 
 def main():
-    k = 3;
-    testInputPath = './self_test.csv'
-    trainningInputPath = './trainCopy.csv'
-    weightlist = [0.1,0.0,0.1,4.100000000000001,0.4,1.8000000000000005]
+    k = 5;
+    testInputPath = './testProdIntro_binary.csv'
+    trainningInputPath = './trainProdIntro_binary.csv'
+    weightlist = [1,1,1,2,2,1,2,1]
     knn(trainningInputPath,testInputPath,k,weightlist)
     getAccuracy(trainningInputPath,testInputPath,k,weightlist)
 

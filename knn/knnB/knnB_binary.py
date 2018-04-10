@@ -2,7 +2,10 @@ import math
 import operator
 import csv
 
-def loadData(trainningInputPath, testInputPath, trainingSet=[] , testSet=[]):
+def loadData(trainingInputPath, testInputPath):
+    set = []
+    trainingSet = []
+    testSet = []
     with open(testInputPath, "r") as csvfile:
         test_data = csv.reader(csvfile, delimiter=' ', quotechar='|')
         index = -1
@@ -11,7 +14,7 @@ def loadData(trainningInputPath, testInputPath, trainingSet=[] , testSet=[]):
                 features = row[0].split(',')
                 testSet.append(features)
             index += 1
-    with open(trainningInputPath, "r") as csvfile:
+    with open(trainingInputPath, "r") as csvfile:
         test_data = csv.reader(csvfile, delimiter=' ', quotechar='|')
         index = -1
         for row in test_data:
@@ -36,6 +39,9 @@ def loadData(trainningInputPath, testInputPath, trainingSet=[] , testSet=[]):
     for i in range(len(trainingSet)):
         for j in num_column:
             trainingSet[i][j] = count(max_list[j],min_list[j],trainingSet[i][j])
+    set.append(trainingSet)
+    set.append(testSet)
+    return set
 
 def max_num_in_list(list):
     max = float(list[0])
@@ -58,12 +64,11 @@ def count(max_num, min_num, num):
     min_num = float(min_num)
     return (num - min_num) / (max_num - min_num)
 
-# next step: imlement distance calculation based on weightlist
 def euclidDistance(vector1,vector2,weightlist):
     length = len(vector1)
     distance = 0
     for index in range(length-1):
-        if index == 0 or index == 1 or index == 4 or index == 5:
+        if type(vector1[index]) == str:
             if vector1[index] == vector2[index]:
                 tmp = 0
             else:
@@ -98,9 +103,9 @@ def getLabel(neighbors):
     return ans[0][0]
 
 def knn(trainningInputPath,testInputPath,k,weightlist):
-    trainingSet = []
-    testSet = []
-    loadData(trainningInputPath,testInputPath,trainingSet,testSet)
+    set = loadData(trainningInputPath,testInputPath)
+    trainingSet = set[0]
+    testSet = set[1]
     predictions = []
     length = len(testSet)
     for i in range(length):
@@ -109,10 +114,7 @@ def knn(trainningInputPath,testInputPath,k,weightlist):
         predictions.append(label)
     print(predictions)
 
-def getAccuracy(trainningInputPath,testInputPath,k,weightlist):
-    trainingSet = []
-    testSet = []
-    loadData(trainningInputPath,testInputPath,trainingSet,testSet)
+def getAccuracy(trainingSet,testSet,k,weightlist):
     length = len(testSet)
     sum = 0;
     correct = 0;
@@ -121,18 +123,62 @@ def getAccuracy(trainningInputPath,testInputPath,k,weightlist):
         label = getLabel(neighbors)
         sum += 1
         if label != testSet[i][-1]:
-            print("not match: ",testSet[i],"predicted: "+label,"closest neighbor: ",neighbors[0])
             continue
         correct += 1
-    print('Accuracy: ',correct/sum * 100,'%')
-        
+    return correct/sum
+
+def n_fold(trainingInputPath,n):
+    datasets = {}
+    total_set = []
+    with open(trainingInputPath, "r") as csvfile:
+        test_data = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        index = -1
+        for row in test_data:
+            if index >= 0:
+                features = row[0].split(',')
+                total_set.append(features)
+            index += 1
+    copy_total = total_set[:]
+    each_count = (int)(len(total_set)/n)
+    position = 0
+    for i in range(n):
+        set = []
+        training_set=[]
+        testing_set=[]
+        total_set = copy_total[:]
+        for j in range(each_count):
+            if (position + j) < len(total_set)-1:
+                testing_set.append(total_set[position+j])
+                total_set.pop(position+j)
+        position += each_count
+        training_set = total_set
+        set.append(training_set)
+        set.append(testing_set)
+        datasets[i] = set 
+    return datasets
+
+def get_average_accuracy(datasets,k,weightlist):
+    sum = 0
+    for i in range(10):
+        set = datasets[i]
+        training_set = set[0]
+        testing_set = set[1]
+        acc = getAccuracy(training_set,testing_set,k,weightlist)
+        sum += acc
+    return sum/10
+
+def evaluate(trainingInputPath,k,weightlist):
+    datasets = n_fold(trainingInputPath,10)
+    acc = get_average_accuracy(datasets,k,weightlist)
+    print(acc*100,"%")
 
 def main():
     k = 5;
     testInputPath = './testProdIntro_binary.csv'
-    trainningInputPath = './trainProdIntro_binary.csv'
-    weightlist = [1,1,1,2,2,1,2,1]
-    knn(trainningInputPath,testInputPath,k,weightlist)
-    getAccuracy(trainningInputPath,testInputPath,k,weightlist)
+    trainingInputPath = './trainProdIntro_binary.csv'
+    weightlist = [0.024461023712459402, 0.15834202150492865, 0.010759602207293533, 0.10509735230635024, 0.08996645391153464, 0.0683162827997523, 0.25068668442722375, 0.29237057913045744]
+    #knn(trainingInputPath,testInputPath,k,weightlist)
+    evaluate(trainingInputPath,k,weightlist)
 
 main()
+

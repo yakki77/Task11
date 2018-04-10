@@ -3,7 +3,10 @@ import operator
 import csv
 import numpy as np
 
-def loadData(trainningInputPath, testInputPath, trainingSet=[] , testSet=[]):
+def loadData(trainingInputPath, testInputPath):
+    set = []
+    trainingSet = []
+    testSet = []
     with open(testInputPath, "r") as csvfile:
         test_data = csv.reader(csvfile, delimiter=' ', quotechar='|')
         index = -1
@@ -12,7 +15,7 @@ def loadData(trainningInputPath, testInputPath, trainingSet=[] , testSet=[]):
                 features = row[0].split(',')
                 testSet.append(features)
             index += 1
-    with open(trainningInputPath, "r") as csvfile:
+    with open(trainingInputPath, "r") as csvfile:
         test_data = csv.reader(csvfile, delimiter=' ', quotechar='|')
         index = -1
         for row in test_data:
@@ -37,6 +40,9 @@ def loadData(trainningInputPath, testInputPath, trainingSet=[] , testSet=[]):
     for i in range(len(trainingSet)):
         for j in num_column:
             trainingSet[i][j] = count(max_list[j],min_list[j],trainingSet[i][j])
+    set.append(trainingSet)
+    set.append(testSet)
+    return set
 
 def max_num_in_list(list):
     max = float(list[0])
@@ -59,12 +65,11 @@ def count(max_num, min_num, num):
     min_num = float(min_num)
     return (num - min_num) / (max_num - min_num)
 
-# next step: imlement distance calculation based on weightlist
 def euclidDistance(vector1,vector2,weightlist):
     length = len(vector1)
     distance = 0
     for index in range(length-1):
-        if index == 0 or index == 1 or index == 4 or index == 5:
+        if type(vector1[index]) == str:
             if vector1[index] == vector2[index]:
                 tmp = 0
             else:
@@ -96,15 +101,22 @@ def getLabel(neighbors):
     return sum/length
 
 def knn(trainningInputPath,testInputPath,k,weightlist):
-    trainingSet = []
-    testSet = []
-    loadData(trainningInputPath,testInputPath,trainingSet,testSet)
+    set = loadData(trainningInputPath,testInputPath)
+    trainingSet = set[0]
+    testSet = set[1]
     predictions = []
+    classfier = []
     length = len(testSet)
     for i in range(length):
         neighbors = findNeighborList(testSet[i],trainingSet,k,weightlist)
         label = getLabel(neighbors)
+        if label >= 20:
+            classfier.append(1)
+        else:
+            classfier.append(0)
         predictions.append(label)
+    print(predictions)
+    print(classfier)
     return predictions
 
 def mserror(real,pred):
@@ -113,12 +125,39 @@ def mserror(real,pred):
     for i in range(length):
         sum += pow(float(real[i]) - float(pred[i]),2)
     mse = sum / length
-    return math.sqrt(mse)
+    return mse
 
-def getAccuracy(trainningInputPath,testInputPath,k,weightlist):
-    trainingSet = []
-    testSet = []
-    loadData(trainningInputPath,testInputPath,trainingSet,testSet)
+def n_fold(trainingInputPath,n):
+    datasets = {}
+    total_set = []
+    with open(trainingInputPath, "r") as csvfile:
+        test_data = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        index = -1
+        for row in test_data:
+            if index >= 0:
+                features = row[0].split(',')
+                total_set.append(features)
+            index += 1
+    copy_total = total_set[:]
+    each_count = (int)(len(total_set)/n)
+    position = 0
+    for i in range(n):
+        set = []
+        training_set=[]
+        testing_set=[]
+        total_set = copy_total[:]
+        for j in range(each_count):
+            if (position + j) < len(total_set)-1:
+                testing_set.append(total_set[position+j])
+                total_set.pop(position+j)
+        position += each_count
+        training_set = total_set
+        set.append(training_set)
+        set.append(testing_set)
+        datasets[i] = set 
+    return datasets
+
+def getMSE(trainingSet,testSet,k,weightlist):
     length = len(testSet)
     pred = []
     real = []
@@ -129,16 +168,27 @@ def getAccuracy(trainningInputPath,testInputPath,k,weightlist):
         real.append(testSet[i][-1])
     mse = mserror(real,pred)
     return mse
-        
+ 
+def get_average_mse(datasets,k,weightlist):
+    sum = 0
+    for i in range(10):
+        set = datasets[i]
+        training_set = set[0]
+        testing_set = set[1]
+        acc = getMSE(training_set,testing_set,k,weightlist)
+        sum += acc
+    return sum/10
+
+def evaluate(trainingInputPath,k,weightlist):
+    datasets = n_fold(trainingInputPath,10)
+    acc = get_average_mse(datasets,k,weightlist)
+    print("mse: ",acc)
 
 def main():
     k = 5;
-    testInputPath = './trainProdIntro_real.csv'
-    trainningInputPath = './trainProdIntro_real.csv'
-    weightlist = [1.6562256823052202, 1.501442804465919, 5.115261438132741, 6.943574192273207, 10.00062170623412, 0.48831091648035563, 6.144165566203044, 5.826528840985738]
-    predictions = knn(trainningInputPath,testInputPath,k,weightlist)
-    print(predictions)
-    mse = getAccuracy(trainningInputPath,testInputPath,k,weightlist)
-    print('MSE: ',mse)
-
+    testInputPath = './testProdIntro_real.csv'
+    trainingInputPath = './trainProdIntro_real.csv'
+    weightlist = [0.04218163865832884, 0.16817483767715605, 0.25787226634654575, 0.042163301375043795, 0.10787056682559643, 0.012360316787341412, 0.31445142719712316, 0.05492564513286457]
+    #knn(trainingInputPath,testInputPath,k,weightlist)
+    evaluate(trainingInputPath,5,weightlist)
 main()

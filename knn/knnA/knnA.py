@@ -128,8 +128,8 @@ def getAccuracy(trainningInputPath,testInputPath,k,weightlist):
 
 def main():
     k = 3;
-    testInputPath = './self_test.csv'
-    trainningInputPath = './trainCopy.csv'
+    testInputPath = './testProdSelection.csv'
+    trainningInputPath = './trainProdSelection.csv'
     weightlist = [0.1,0.0,0.1,4.100000000000001,0.4,1.8000000000000005]
     knn(trainningInputPath,testInputPath,k,weightlist)
     getAccuracy(trainningInputPath,testInputPath,k,weightlist)

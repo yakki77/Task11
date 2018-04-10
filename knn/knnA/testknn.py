@@ -1,5 +1,0 @@
-from knn import euclidDistance
-vector1 = ['engineer', 'spend<<saving', 0.3968253968253968, 0.13372093023255813, 0.547378928165766, 0.22732386640321958]
-vector2 = ['engineer', 'spend<<saving', 0.3968253968253968, 0.13372093023255813, 0.547378928165766, 0.22732386640321958]
-print(euclidDistance(vector1,vector2))
-

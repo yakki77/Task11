@@ -3,7 +3,6 @@ import operator
 import csv
 
 def loadData(trainingInputPath, testInputPath):
-    set = []
     trainingSet = []
     testSet = []
     with open(testInputPath, "r") as csvfile:
@@ -22,6 +21,10 @@ def loadData(trainingInputPath, testInputPath):
                 features = row[0].split(',')
                 trainingSet.append(features)
             index += 1
+    return preprocess(trainingSet,testSet)
+
+def preprocess(trainingSet,testSet):
+    set = []
     max_list={}
     min_list={}
     num_column=[2,3,6,7]
@@ -152,33 +155,33 @@ def n_fold(trainingInputPath,n):
                 total_set.pop(position+j)
         position += each_count
         training_set = total_set
-        set.append(training_set)
-        set.append(testing_set)
-        datasets[i] = set 
+        datasets[i] = preprocess(total_set,testing_set)
     return datasets
 
-def get_average_accuracy(datasets,k,weightlist):
+def get_average_accuracy(datasets,k,n,weightlist):
     sum = 0
-    for i in range(10):
+    for i in range(n):
         set = datasets[i]
         training_set = set[0]
         testing_set = set[1]
         acc = getAccuracy(training_set,testing_set,k,weightlist)
+        print("accuracy",acc)
         sum += acc
-    return sum/10
+    return sum/n
 
-def evaluate(trainingInputPath,k,weightlist):
-    datasets = n_fold(trainingInputPath,10)
-    acc = get_average_accuracy(datasets,k,weightlist)
-    print(acc*100,"%")
+def evaluate(trainingInputPath,k,n,weightlist):
+    datasets = n_fold(trainingInputPath,n)
+    acc = get_average_accuracy(datasets,k,n,weightlist)
+    print(acc * 100,"%")
 
 def main():
-    k = 5;
+    k = 5
+    n = 150
     testInputPath = './testProdIntro_binary.csv'
     trainingInputPath = './trainProdIntro_binary.csv'
-    weightlist = [0.024461023712459402, 0.15834202150492865, 0.010759602207293533, 0.10509735230635024, 0.08996645391153464, 0.0683162827997523, 0.25068668442722375, 0.29237057913045744]
+    weightlist = [0.02446, 0.1583, 0.01, 0.105, 0.09, 0.068, 0.25, 0.29]
     #knn(trainingInputPath,testInputPath,k,weightlist)
-    evaluate(trainingInputPath,k,weightlist)
+    evaluate(trainingInputPath,k,n,weightlist)
 
 main()
 

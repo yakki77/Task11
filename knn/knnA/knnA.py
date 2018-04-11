@@ -3,7 +3,6 @@ import operator
 import csv
 
 def loadData(trainingInputPath, testInputPath):
-    set = []
     trainingSet = []
     testSet = []
     with open(testInputPath, "r") as csvfile:
@@ -22,9 +21,14 @@ def loadData(trainingInputPath, testInputPath):
                 features = row[0].split(',')
                 trainingSet.append(features)
             index += 1
+    return preprocess(trainingSet,testSet)
+    
+
+def preprocess(trainingSet,testSet):
+    set = []
     max_list={}
     min_list={}
-    num_column=[2,3,6,7]
+    num_column=[2,3,4,5]
     for i in num_column:
         vector = []
         for j in range(len(testSet)):
@@ -64,7 +68,6 @@ def count(max_num, min_num, num):
     min_num = float(min_num)
     return (num - min_num) / (max_num - min_num)
 
-# next step: imlement distance calculation based on weightlist
 def euclidDistance(vector1,vector2,weightlist):
     length = len(vector1)
     distance = 0
@@ -104,9 +107,9 @@ def getLabel(neighbors):
     return ans[0][0]
 
 def knn(trainningInputPath,testInputPath,k,weightlist):
-    trainingSet = []
-    testSet = []
-    loadData(trainningInputPath,testInputPath,trainingSet,testSet)
+    set = loadData(trainningInputPath,testInputPath)
+    trainingSet = set[0]
+    testSet = set[1]
     predictions = []
     length = len(testSet)
     for i in range(length):
@@ -153,34 +156,33 @@ def n_fold(trainingInputPath,n):
                 total_set.pop(position+j)
         position += each_count
         training_set = total_set
-        set.append(training_set)
-        set.append(testing_set)
-        datasets[i] = set 
+        datasets[i] = preprocess(total_set,testing_set)
     return datasets
 
-def get_average_accuracy(datasets,k,weightlist):
+def get_average_accuracy(datasets,k,n,weightlist):
     sum = 0
-    for i in range(10):
+    for i in range(n):
         set = datasets[i]
         training_set = set[0]
         testing_set = set[1]
         acc = getAccuracy(training_set,testing_set,k,weightlist)
         print("accuracy",acc)
         sum += acc
-    return sum/10
+    return sum/n
 
-def evaluate(trainingInputPath,k,weightlist):
-    datasets = n_fold(trainingInputPath,10)
-    acc = get_average_accuracy(datasets,k,weightlist)
+def evaluate(trainingInputPath,k,n,weightlist):
+    datasets = n_fold(trainingInputPath,n)
+    acc = get_average_accuracy(datasets,k,n,weightlist)
     print(acc * 100,"%")
 
 
 def main():
     k = 3;
+    n = 180
     testInputPath = './testProdSelection.csv'
     trainingInputPath = './trainProdSelection.csv'
-    weightlist = [0.1,0.0,0.1,4.100000000000001,0.4,1.8000000000000005]
+    weightlist = [0.1,0.0,0.1,4.1,0.4,1.8]
     #knn(trainingInputPath,testInputPath,k,weightlist)
-    evaluate(trainingInputPath,k,weightlist)
+    evaluate(trainingInputPath,k,n,weightlist)
 
 main()

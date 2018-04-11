@@ -4,7 +4,6 @@ import csv
 import numpy as np
 
 def loadData(trainingInputPath, testInputPath):
-    set = []
     trainingSet = []
     testSet = []
     with open(testInputPath, "r") as csvfile:
@@ -23,6 +22,10 @@ def loadData(trainingInputPath, testInputPath):
                 features = row[0].split(',')
                 trainingSet.append(features)
             index += 1
+    return preprocess(trainingSet,testSet)
+
+def preprocess(trainingSet,testSet):
+    set = []
     max_list={}
     min_list={}
     num_column=[2,3,6,7]
@@ -43,6 +46,7 @@ def loadData(trainingInputPath, testInputPath):
     set.append(trainingSet)
     set.append(testSet)
     return set
+
 
 def max_num_in_list(list):
     max = float(list[0])
@@ -152,9 +156,7 @@ def n_fold(trainingInputPath,n):
                 total_set.pop(position+j)
         position += each_count
         training_set = total_set
-        set.append(training_set)
-        set.append(testing_set)
-        datasets[i] = set 
+        datasets[i] = preprocess(total_set,testing_set)
     return datasets
 
 def getMSE(trainingSet,testSet,k,weightlist):
@@ -169,26 +171,29 @@ def getMSE(trainingSet,testSet,k,weightlist):
     mse = mserror(real,pred)
     return mse
  
-def get_average_mse(datasets,k,weightlist):
+def get_average_mse(datasets,k,n,weightlist):
     sum = 0
-    for i in range(10):
+    for i in range(n):
         set = datasets[i]
         training_set = set[0]
         testing_set = set[1]
         acc = getMSE(training_set,testing_set,k,weightlist)
         sum += acc
-    return sum/10
+    return sum/n
 
-def evaluate(trainingInputPath,k,weightlist):
-    datasets = n_fold(trainingInputPath,10)
-    acc = get_average_mse(datasets,k,weightlist)
+def evaluate(trainingInputPath,k,n,weightlist):
+    datasets = n_fold(trainingInputPath,n)
+    acc = get_average_mse(datasets,k,n,weightlist)
     print("mse: ",acc)
 
 def main():
-    k = 5;
+    k = 5
+    n = 150
     testInputPath = './testProdIntro_real.csv'
     trainingInputPath = './trainProdIntro_real.csv'
-    weightlist = [0.02018163865832884, 0.16817483767715605, 0.25787226634654575, 0.042163301375043795, 0.10787056682559643, 0.012360316787341412, 0.31445142719712316, 0.05492564513286457]
+    #weightlist = [0.02018163865832884, 0.16817483767715605, 0.25787226634654575, 0.042163301375043795, 0.10787056682559643, 0.012360316787341412, 0.31445142719712316, 0.05492564513286457]
+    #weightlist = [0.02446, 0.1583, 0.01, 0.105, 0.09, 0.068, 0.25, 0.29]
+    weightlist = [1,1,1.24,1,1,1,1.4,4]
     #knn(trainingInputPath,testInputPath,k,weightlist)
-    evaluate(trainingInputPath,5,weightlist)
+    evaluate(trainingInputPath,k,n,weightlist)
 main()

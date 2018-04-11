@@ -3,6 +3,7 @@ import math
 import numpy as np
 import sys
 
+# Load training and test data together, but text data can be None if called in cross validation
 def load_data(trainningInputPath, testInputPath=None):
     trainingSet = []
     with open(trainningInputPath, "r") as csvfile:
@@ -27,6 +28,7 @@ def load_data(trainningInputPath, testInputPath=None):
     else:
         return trainingSet
 
+# Calculate entropy of the column with index passed in
 def entropy(dataset, feature_index):
     E = 0
     number_of_entries = len(dataset)
@@ -43,6 +45,7 @@ def entropy(dataset, feature_index):
 
     return E
 
+# Split dataset into sub-datasets, except the current column with index passed in 
 def split_data(dataset, feature_index):
     features = [row[feature_index] for row in dataset ]
     unique_feature = list(set(features))
@@ -54,12 +57,15 @@ def split_data(dataset, feature_index):
                 sub_data[each].append(row[:feature_index] + row[feature_index+1:])
     return sub_data
 
-
+# Define the tree node class
+# Feature_index is the the column of the current node
+# Children are the branches and sub nodes
 class TreeNode:
     def __init__(self, feature_index):
         self.feature_index = feature_index
         self.children = {}
 
+# Create tree 
 def createTree(dataset):
     if len(dataset[0]) == 1:
         return getMajority(dataset)
@@ -82,6 +88,7 @@ def createTree(dataset):
         node.children[k] = createTree(v)
     return node
 
+# Calculate the Information gain ratio
 def IG_ratio(dataset, feature_index):
     E_parent = entropy(dataset, -1)
     E_feature = entropy(dataset, feature_index)
@@ -98,6 +105,8 @@ def IG_ratio(dataset, feature_index):
         IG_ratio = 0
     return IG_ratio
 
+# Count the majority
+# For task A's label, only count the last char of the string
 def getMajority(dataset):
     if isNum(dataset[0][-1]) == True:
         labels = [row[-1] for row in dataset]
@@ -108,6 +117,7 @@ def getMajority(dataset):
         label_counts = np.bincount(labels)
         return 'C' + str(np.argmax(label_counts))
 
+# Judge whether a column consists of numbers
 def isNum(column):
     try:
         float(column[0])
@@ -115,12 +125,15 @@ def isNum(column):
     except ValueError:
         return False
 
+# Judge whether a column consists of continuous numbers
+# If there are more than 10 different numbers, we count them as continuous numbers
 def isContinuous(column):
     unique_data = set(column)
     if len(unique_data) > 10:
         return True
     return False
 
+# Split continuous data into discrete values
 def split_continuous(column, division = 7):
     column_max = max(column)
     column_min = min(column)
@@ -142,6 +155,7 @@ def split_continuous(column, division = 7):
 
     return res
 
+# Process training data and test data together, change all continuous features into discrete features
 def process_data(train, test):
     dataset = train + test
     for i in range(len(dataset[0])-1):
@@ -156,7 +170,7 @@ def process_data(train, test):
     clean_test = dataset[len(train):]
     return clean_train, clean_test
     
-
+# Classify test dataset
 def classify(tree, data_row):
     feature = tree.feature_index
     for key, value in tree.children.items():
@@ -168,6 +182,7 @@ def classify(tree, data_row):
                     data_row = data_row[:feature] + data_row[feature+1:]
                     return classify(tree, data_row)
 
+# Do cross-validation
 def cross_validation(data, n=1):
     count = 0
     length = len(data)

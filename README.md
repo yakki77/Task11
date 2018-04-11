@@ -49,13 +49,15 @@ If you want to classify a test dataset in task A, use the following command (All
 python3 decision_tree_A.py 'classify' training_data_filepath test_data_filepath
 ```
 
+It will print the predicted labels.
+
 If you want to do cross-validation of a dataet in task A, use the following command:
 
 ```python
 python3 decision_tree_A.py 'crossvalidation' training_data_filepath None
 ```
 
-Notice that for cross-validation, the third system argument should be None.
+It will print the average accuracy. Notice that for cross-validation, the third system argument should be None.
 
 If you want to classify a test dataset in task B, use the following command:
 

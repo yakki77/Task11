@@ -167,7 +167,6 @@ def classify(tree, data_row):
                     tree = value
                     data_row = data_row[:feature] + data_row[feature+1:]
                     return classify(tree, data_row)
-    # return 'C1'
 
 def cross_validation(data, n=1):
     count = 0
@@ -185,17 +184,25 @@ def cross_validation(data, n=1):
     return count/length
 
 def main(action, train, test):
-	if action == 'classify':
-		train_data, test_data = load_data(train, test)
-		clean_train, clean_test = process_data(train_data, test_data)
-		tree = createTree(clean_train)
-		labels = []
-		for row in clean_test:
-			labels.append(classify(tree, row))
-		print(labels)
-	else:
-		train_data = load_data(train)
-		print(cross_validation(train_data))
+    if action == 'classify':
+        train_data, test_data = load_data(train, test)
+        clean_train, clean_test = process_data(train_data, test_data)
+        if isNum(clean_train[0][-1]):
+            default = '1'
+        else:
+            default = 'C1'
+        tree = createTree(clean_train)
+        labels = []
+        for row in clean_test:
+            l = classify(tree, row)
+            if l is None:
+                labels.append(default)
+            else:
+                labels.append(l)
+        print(labels)
+    else:
+        train_data = load_data(train)
+        print(cross_validation(train_data))
 
 
 if __name__ == "__main__":

@@ -191,9 +191,9 @@ def main():
     n = 150
     testInputPath = './testProdIntro_real.csv'
     trainingInputPath = './trainProdIntro_real.csv'
-    #weightlist = [0.02018163865832884, 0.16817483767715605, 0.25787226634654575, 0.042163301375043795, 0.10787056682559643, 0.012360316787341412, 0.31445142719712316, 0.05492564513286457]
-    #weightlist = [0.02446, 0.1583, 0.01, 0.105, 0.09, 0.068, 0.25, 0.29]
     weightlist = [1,1,1.24,1,1,1,1.4,4]
-    #knn(trainingInputPath,testInputPath,k,weightlist)
-    evaluate(trainingInputPath,k,n,weightlist)
+    knn(trainingInputPath,testInputPath,k,weightlist)
+    #evaluate(trainingInputPath,k,n,weightlist)
+
+
 main()

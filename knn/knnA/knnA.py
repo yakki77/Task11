@@ -2,6 +2,7 @@ import math
 import operator
 import csv
 
+#loading data from file path
 def loadData(trainingInputPath, testInputPath):
     trainingSet = []
     testSet = []
@@ -22,8 +23,9 @@ def loadData(trainingInputPath, testInputPath):
                 trainingSet.append(features)
             index += 1
     return preprocess(trainingSet,testSet)
-    
 
+
+# helper method to normalize dataset
 def preprocess(trainingSet,testSet):
     set = []
     max_list={}
@@ -47,6 +49,7 @@ def preprocess(trainingSet,testSet):
     set.append(testSet)
     return set
 
+#helper method
 def max_num_in_list(list):
     max = float(list[0])
     for a in list:

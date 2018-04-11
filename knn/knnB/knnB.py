@@ -3,6 +3,7 @@ import operator
 import csv
 import sys
 
+#loading data from file path
 def loadData(trainingInputPath, testInputPath):
     trainingSet = []
     testSet = []
@@ -24,6 +25,7 @@ def loadData(trainingInputPath, testInputPath):
             index += 1
     return preprocess(trainingSet,testSet)
 
+#normalize dataset
 def preprocess(trainingSet,testSet):
     set = []
     max_list={}
@@ -47,7 +49,7 @@ def preprocess(trainingSet,testSet):
     set.append(testSet)
     return set
 
-
+#find the max value in a list
 def max_num_in_list(list):
     max = float(list[0])
     for a in list:
@@ -55,6 +57,8 @@ def max_num_in_list(list):
         if a > max:
             max = a
     return max
+
+#find the min value in a list
 def min_num_in_list(list):
     min = float(list[0])
     for a in list:
@@ -63,12 +67,14 @@ def min_num_in_list(list):
             min = a
     return min
 
+#return the scaled value of an attribute
 def count(max_num, min_num, num):
     num = float(num)
     max_num = float(max_num)
     min_num = float(min_num)
     return (num - min_num) / (max_num - min_num)
 
+#caculate euclid Distance
 def euclidDistance(vector1,vector2,weightlist):
     length = len(vector1)
     distance = 0
@@ -83,6 +89,7 @@ def euclidDistance(vector1,vector2,weightlist):
         distance = distance + pow(tmp,2)*weightlist[index]
     return math.sqrt(distance)
 
+#find the neighbor list based on a test vector and training set
 def findNeighborList(testVector,trainningSet,k,weightlist):
     neighbors = []
     length = len(trainningSet)
@@ -95,6 +102,7 @@ def findNeighborList(testVector,trainningSet,k,weightlist):
     	ans.append(neighbors[neighbor][0])
     return ans
 
+#get the label based on current neighbors list for binary test
 def getLabelBinary(neighbors):
     frequency={}
     length = len(neighbors)
@@ -107,6 +115,7 @@ def getLabelBinary(neighbors):
     ans = sorted(frequency.items(), key=operator.itemgetter(1), reverse=True)
     return ans[0][0]
 
+#get the label based on current neighbors list for real test
 def getLabelReal(neighbors):
     frequency={}
     length = len(neighbors)
@@ -116,6 +125,7 @@ def getLabelReal(neighbors):
         sum += float(score)
     return sum/length
 
+# main logic of knn algorithm for binary test
 def knnBinary(trainningInputPath,testInputPath,k,weightlist):
     set = loadData(trainningInputPath,testInputPath)
     trainingSet = set[0]
@@ -128,6 +138,7 @@ def knnBinary(trainningInputPath,testInputPath,k,weightlist):
         predictions.append(label)
     print(predictions)
 
+# main logic of knn algorithm for real test
 def knnReal(trainningInputPath,testInputPath,k,weightlist):
     set = loadData(trainningInputPath,testInputPath)
     trainingSet = set[0]
@@ -140,6 +151,7 @@ def knnReal(trainningInputPath,testInputPath,k,weightlist):
         predictions.append(label)
     print(predictions)
 
+# get the accuracy for test set
 def getAccuracy(trainingSet,testSet,k,weightlist):
     length = len(testSet)
     sum = 0;
@@ -153,6 +165,7 @@ def getAccuracy(trainingSet,testSet,k,weightlist):
         correct += 1
     return correct/sum
 
+# calculate mse 
 def mserror(real,pred):
     length = len(real)
     sum = 0
@@ -161,6 +174,7 @@ def mserror(real,pred):
     mse = sum / length
     return mse
 
+# split the data into n folds
 def n_fold(trainingInputPath,n):
     datasets = {}
     total_set = []
@@ -189,6 +203,7 @@ def n_fold(trainingInputPath,n):
         datasets[i] = preprocess(total_set,testing_set)
     return datasets
 
+#calculate mse for a given test set and weightlist
 def getMSE(trainingSet,testSet,k,weightlist):
     length = len(testSet)
     pred = []
@@ -201,6 +216,7 @@ def getMSE(trainingSet,testSet,k,weightlist):
     mse = mserror(real,pred)
     return mse
  
+# get the average mse for given weightlist
 def get_average_mse(datasets,k,n,weightlist):
     sum = 0
     for i in range(n):
@@ -211,6 +227,7 @@ def get_average_mse(datasets,k,n,weightlist):
         sum += acc
     return sum/n
 
+# get the average accuracy for given weightlist
 def get_average_accuracy(datasets,k,n,weightlist):
     sum = 0
     for i in range(n):
@@ -221,17 +238,20 @@ def get_average_accuracy(datasets,k,n,weightlist):
         sum += acc
     return sum/n
 
+# test method for binary data
 def evaluateBinary(trainingInputPath,k,n,weightlist):
     datasets = n_fold(trainingInputPath,n)
     acc = get_average_accuracy(datasets,k,n,weightlist)
     print(acc * 100,"%")
 
+# test method for real data
 def evaluateReal(trainingInputPath,k,n,weightlist):
     datasets = n_fold(trainingInputPath,n)
     acc = get_average_mse(datasets,k,n,weightlist)
     print("mse: ",acc)
-
-def evaluate(k,type):
+ 
+# test method
+def evaluate(k,type,trainingInputPath,testInputPath):
     n = 150
     testInputPathBinary = './testProdIntro_binary.csv'
     trainingInputPathBinary = './trainProdIntro_binary.csv'
@@ -246,30 +266,29 @@ def evaluate(k,type):
     else:
         print("invalid type!")
 
-def knn(k,t):
-    testInputPathBinary = './testProdIntro_binary.csv'
-    trainingInputPathBinary = './trainProdIntro_binary.csv'
+#main logic of knn
+def knn(k,t,trainingInputPath,testInputPath):
     weightlistBinary = [0.02446, 0.1583, 0.01, 0.105, 0.09, 0.068, 0.25, 0.29]
-    testInputPathReal = './testProdIntro_real.csv'
-    trainingInputPathReal = './trainProdIntro_real.csv'
     weightlistReal = [1,1,1.24,1,1,1,1.4,4]
     if t == 'real':
-        knnReal(trainingInputPathReal,testInputPathReal,k,weightlistReal)
+        knnReal(trainingInputPath,testInputPath,k,weightlistReal)
     elif t == 'binary':
-        knnBinary(trainingInputPathBinary,testInputPathBinary,k,weightlistBinary)
+        knnBinary(trainingInputPath,testInputPath,k,weightlistBinary)
     else:
         print("invalid type!")
 
-def main(t,action):
+def main(t,action,trainingInputPath,testInputPath):
     k = 5
     if action == 'prediction':
-        knn(k,t)
+        knn(k,t,trainingInputPath,testInputPath)
     elif action =='validation':
-        evaluate(k,t)
+        evaluate(k,t,trainingInputPath,testInputPath)
     else:
         print('invalid argument')
 
 if __name__== "__main__":
     t = sys.argv[1]
     action = sys.argv[2]
-    main(t,action)
+    trainingInputPath = sys.argv[3]
+    testInputPath = sys.argv[4]
+    main(t,action,trainingInputPath,testInputPath)

@@ -1,6 +1,7 @@
 import math
 import operator
 import csv
+import sys
 
 #loading data from file path
 def loadData(trainingInputPath, testInputPath):
@@ -25,7 +26,7 @@ def loadData(trainingInputPath, testInputPath):
     return preprocess(trainingSet,testSet)
 
 
-# helper method to normalize dataset
+#normalize dataset
 def preprocess(trainingSet,testSet):
     set = []
     max_list={}
@@ -49,7 +50,7 @@ def preprocess(trainingSet,testSet):
     set.append(testSet)
     return set
 
-#helper method
+#find the max value in a list
 def max_num_in_list(list):
     max = float(list[0])
     for a in list:
@@ -57,6 +58,8 @@ def max_num_in_list(list):
         if a > max:
             max = a
     return max
+
+#find the min value in a list
 def min_num_in_list(list):
     min = float(list[0])
     for a in list:
@@ -65,12 +68,14 @@ def min_num_in_list(list):
             min = a
     return min
 
+#return the scaled value of an attribute
 def count(max_num, min_num, num):
     num = float(num)
     max_num = float(max_num)
     min_num = float(min_num)
     return (num - min_num) / (max_num - min_num)
 
+#caculate euclid Distance
 def euclidDistance(vector1,vector2,weightlist):
     length = len(vector1)
     distance = 0
@@ -85,6 +90,7 @@ def euclidDistance(vector1,vector2,weightlist):
         distance = distance + pow(tmp,2)*weightlist[index]
     return math.sqrt(distance)
 
+#find the neighbor list based on a test vector and training set
 def findNeighborList(testVector,trainningSet,k,weightlist):
     neighbors = []
     length = len(trainningSet)
@@ -97,6 +103,7 @@ def findNeighborList(testVector,trainningSet,k,weightlist):
     	ans.append(neighbors[neighbor][0])
     return ans
 
+#get the label based on current neighbors list
 def getLabel(neighbors):
     frequency={}
     length = len(neighbors)
@@ -109,8 +116,10 @@ def getLabel(neighbors):
     ans = sorted(frequency.items(), key=operator.itemgetter(1), reverse=True)
     return ans[0][0]
 
-def knn(trainningInputPath,testInputPath,k,weightlist):
-    set = loadData(trainningInputPath,testInputPath)
+# main logic of knn algorithm
+def knn(k,trainingInputPath,testInputPath):
+    weightlist = [0.1,0.0,0.1,4.1,0.4,1.8]
+    set = loadData(trainingInputPath,testInputPath)
     trainingSet = set[0]
     testSet = set[1]
     predictions = []
@@ -121,6 +130,7 @@ def knn(trainningInputPath,testInputPath,k,weightlist):
         predictions.append(label)
     print(predictions)
 
+# get the accuracy for test set
 def getAccuracy(trainingSet,testSet,k,weightlist):
     length = len(testSet)
     sum = 0;
@@ -134,6 +144,7 @@ def getAccuracy(trainingSet,testSet,k,weightlist):
         correct += 1
     return correct/sum
 
+# split the data into n folds
 def n_fold(trainingInputPath,n):
     datasets = {}
     total_set = []
@@ -162,6 +173,7 @@ def n_fold(trainingInputPath,n):
         datasets[i] = preprocess(total_set,testing_set)
     return datasets
 
+#get average accuracy for given weightlist
 def get_average_accuracy(datasets,k,n,weightlist):
     sum = 0
     for i in range(n):
@@ -169,23 +181,29 @@ def get_average_accuracy(datasets,k,n,weightlist):
         training_set = set[0]
         testing_set = set[1]
         acc = getAccuracy(training_set,testing_set,k,weightlist)
-        print("accuracy",acc)
         sum += acc
     return sum/n
 
-def evaluate(trainingInputPath,k,n,weightlist):
+# test method 
+def evaluate(k,trainingInputPath):
+    weightlist = [0.1,0.0,0.1,4.1,0.4,1.8]
+    n = 180
     datasets = n_fold(trainingInputPath,n)
     acc = get_average_accuracy(datasets,k,n,weightlist)
     print(acc * 100,"%")
 
 
-def main():
-    k = 3;
-    n = 180
-    testInputPath = './testProdSelection.csv'
-    trainingInputPath = './trainProdSelection.csv'
-    weightlist = [0.1,0.0,0.1,4.1,0.4,1.8]
-    #knn(trainingInputPath,testInputPath,k,weightlist)
-    evaluate(trainingInputPath,k,n,weightlist)
+def main(action,trainingInputPath,testInputPath):
+    k = 3
+    if action == 'prediction':
+        knn(k,trainingInputPath,testInputPath)
+    elif action =='validation':
+        evaluate(k,trainingInputPath)
+    else:
+        print('invalid argument')
 
-main()
+if __name__== "__main__":
+    action = sys.argv[1]
+    trainingInputPath = sys.argv[2]
+    testInputPath = sys.argv[3]
+    main(action,trainingInputPath,testInputPath)
